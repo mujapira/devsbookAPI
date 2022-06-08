@@ -36,6 +36,7 @@ return new class extends Migration {
             $table->integer("id_user");
             $table->string("type", 20);
             $table->text('body');
+            $table->dateTime("created_at");
         });
 
         Schema::create('postlikes', function (Blueprint $table) {

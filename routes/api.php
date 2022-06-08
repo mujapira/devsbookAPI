@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\FeedController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -38,7 +39,7 @@ Route::post('/user/cover', [UserController::class, 'updateCover']);
 // Route::get('/user', [UserController::class, 'read']);
 // Route::get('/user/{id}', [UserController::class, 'read']);
 
-// Route::post('/feed', [FeedController::class, 'create']);
+Route::post('/feed', [FeedController::class, 'create']);
 
 // Route::post('/post/{id}/like', [PostController::class, 'like']);
 // Route::post('/post/{id}/comment', [PostController::class, 'comment']);
