@@ -104,6 +104,35 @@ class FeedController extends Controller {
         return $returnArray;
     }
 
+    public function userFeed(Request $r, $id = false) {
+        $returnArray = ['error' => ''];
+
+        if ($id == false) {
+            $id = $this->loggedUser['id'];
+        }
+
+        $page = intval($r->input('page'));
+        $perPage = 2;
+
+        $PostListOrderedByCreatedAt = Post::where('id_user', $id)
+            ->orderBy('created_at', 'desc')
+            ->offset($page * $perPage)
+            ->limit($perPage)
+            ->get();
+
+        $totalPostQuantity = Post::where('id_user', $id)->count();
+        $pageCount = ceil(($totalPostQuantity / $perPage));
+        $postList = $PostListOrderedByCreatedAt;
+
+        $postsWithAdditionalInfo = $this->_postListToObjetc($postList, $this->loggedUser['id']);
+
+        $returnArray['posts'] = $postsWithAdditionalInfo;
+        $returnArray['pageCount'] = $pageCount;
+        $returnArray['CurrentPage'] = $page;
+
+        return $returnArray;
+    }
+
     private function _postListToObjetc($postList, $loggedUserId) {
         foreach ($postList as $postKey => $postItem) {
 
