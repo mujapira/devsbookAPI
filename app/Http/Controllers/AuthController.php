@@ -19,6 +19,47 @@ class AuthController extends Controller {
         );
     }
 
+    public function unauthorized() {
+        return response()->json(['error' => 'unauthorized'], 401);
+    }
+
+    public function login(Request $r) {
+        $returnArray = ['error' => '']; // Error array
+
+        $email = $r->input('email');
+        $password = $r->input('password');
+
+        if ($email && $password) {
+
+            $token = Auth::attempt([
+                'email' => $email,
+                'password' => $password,
+            ]);
+
+            if (!$token) {
+                $returnArray['error'] = 'E-mail or password incorrect';
+            };
+            $returnArray['token'] = $token;
+        } else {
+            $returnArray['error'] = 'Information missing';
+        }
+        return $returnArray;
+    }
+
+    public function logout() {
+        Auth::logout();
+        return ['error' => ''];
+    }
+
+    public function refresh() {
+        $token = Auth::refresh();
+        return [
+            'error' => '',
+            'token' => $token
+        ];
+    }
+
+
     //Route::post('/user', [AuthController::class, 'create']);
     public function create(Request $r) {
         $returnArray = ['error' => '']; // Error array
