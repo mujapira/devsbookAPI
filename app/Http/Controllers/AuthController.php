@@ -24,7 +24,7 @@ class AuthController extends Controller {
     }
 
     public function login(Request $r) {
-        $returnArray = ['error' => '']; // Error array
+        $returnArray = ['error' => ''];
 
         $email = $r->input('email');
         $password = $r->input('password');
@@ -60,10 +60,10 @@ class AuthController extends Controller {
     }
 
 
-    //Route::post('/user', [AuthController::class, 'create']);
     public function create(Request $r) {
-        $returnArray = ['error' => '']; // Error array
-        $name = $r->input('name'); //fields
+        $returnArray = ['error' => ''];
+
+        $name = $r->input('name');
         $email = $r->input('email');
         $password = $r->input('password');
         $birthdate = $r->input('birthdate');
@@ -71,11 +71,11 @@ class AuthController extends Controller {
         if ($name && $email && $password && $birthdate) {
             $emailExists = User::where('email', $email)->count();
 
-            //birthdate validation
+
             if (strtotime($birthdate) === false) {
                 $returnArray['error'] = 'Not a valid birthdate';
             }
-            //email validation
+
             if ($emailExists === 0) {
                 $hash = password_hash($password, PASSWORD_DEFAULT);
                 $newUser = new User();
