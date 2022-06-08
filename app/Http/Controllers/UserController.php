@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Post;
 use App\Models\User;
+use App\Models\UserRelation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Intervention\Image\ImageManagerStatic as Image;
@@ -133,6 +135,44 @@ class UserController extends Controller {
         } else {
             $returnArray['error'] = 'Upload failed';
         }
+
+        return $returnArray;
+    }
+
+    public function read($id = false) {
+        $returnArray = ['error' => ''];
+
+        if ($id) {
+            $userInfo = User::find($id);
+            if (!$userInfo) {
+                $returnArray['error'] = 'User not found';
+            }
+        } else {
+            $userInfo = $this->loggedUser;
+        }
+
+        $userInfo['avatar'] = url('media/avatars/' . $userInfo['avatar']);
+        $userInfo['cover'] = url('media/covers/' . $userInfo['cover']);
+
+        $userInfo['me'] = ($userInfo['id'] == $this->loggedUser['id']) ? true : false;
+
+        $dateFrom = new \DateTime($userInfo['birthdate']);
+        $dateTo = new \DateTime('today');
+        $userInfo['age'] = $dateFrom->diff($dateTo)->y;
+
+        $userInfo['followers'] = UserRelation::where('user_to', $userInfo['id'])->count();
+        $userInfo['following'] = UserRelation::where('user_from', $userInfo['id'])->count();
+        $userInfo['photoCount'] = Post::where('id_user', $userInfo['id'])
+            ->where('type', 'photo')
+            ->count();
+
+
+        $hasRelation = UserRelation::where('user_from', $this->loggedUser['id'])
+            ->where('user_to', $userInfo['id'])->count();
+
+        $userInfo['isFollowing'] = ($hasRelation > 0) ? true : false;
+
+        $returnArray['data'] = $userInfo;
 
         return $returnArray;
     }
