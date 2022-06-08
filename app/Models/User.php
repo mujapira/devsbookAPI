@@ -11,6 +11,8 @@ use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 class User extends Authenticatable implements JWTSubject {
     use HasFactory, Notifiable;
 
+    public $timestamps = false;
+
     /**
      * The attributes that are mass assignable.
      *
@@ -30,6 +32,7 @@ class User extends Authenticatable implements JWTSubject {
     protected $hidden = [
         'password',
         'remember_token',
+        'token'
     ];
 
     /**
