@@ -2,10 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Intervention\Image\ImageManagerStatic as Image;
+use App\Models\Post;
+use App\Models\PostLike;
+use App\Models\Comment;
+use App\Models\PostComment;
+use App\Models\UserRelation;
+use App\Models\User;
 
 class FeedController extends Controller {
     private $loggedUser;
@@ -66,5 +71,71 @@ class FeedController extends Controller {
         }
 
         return $returnArray;
+    }
+
+    public function read(Request $r) {
+        $returnArray = ['error' => ''];
+        $page = intval($r->input('page'));
+        $perPage = 2;
+        $allUsers = [];
+
+        $usersFollowedByLoggeduser = UserRelation::where('user_from', $this->loggedUser['id']);
+        foreach ($usersFollowedByLoggeduser as $userFollowedByLoggeduser) {
+            $allUsers[] = $userFollowedByLoggeduser['user_to'];
+        }
+        $allUsers[] = $this->loggedUser['id'];
+
+        $PostListOrderedByCreatedAt = Post::whereIn('id_user', $allUsers)
+            ->orderBy('created_at', 'desc')
+            ->offset($page * $perPage)
+            ->limit($perPage)
+            ->get();
+
+        $totalPostQuantity = Post::whereIn('id_user', $allUsers)->count();
+        $pageCount = ceil(($totalPostQuantity / $perPage));
+        $postList = $PostListOrderedByCreatedAt;
+
+        $postsWithAdditionalInfo = $this->_postListToObjetc($postList, $this->loggedUser['id']);
+
+        $returnArray['posts'] = $postsWithAdditionalInfo;
+        $returnArray['pageCount'] = $pageCount;
+        $returnArray['CurrentPage'] = $page;
+
+        return $returnArray;
+    }
+
+    private function _postListToObjetc($postList, $loggedUserId) {
+        foreach ($postList as $postKey => $postItem) {
+
+            if ($postItem['id_user'] == $loggedUserId) {
+                $postList[$postKey]['mine'] = true;
+            } else {
+                $postList[$postKey]['mine'] = false;
+            }
+
+            $userInfo = User::find($postItem['id_user']);
+            $userInfo['avatar'] = url('media/avatars/' . $userInfo['avatar']);
+            $userInfo['cover'] = url('media/covers/' . $userInfo['cover']);
+            $postList[$postKey]['user'] = $userInfo;
+
+            $likes = PostLike::where('id_post', $postItem['id'])->count();
+            $postLikes[$postKey]['likeCount'] = $likes;
+
+            $isSelfLiked = PostLike::where('id_post', $postItem['id'])
+                ->where('id_user', $loggedUserId)
+                ->count();
+            $postList[$postKey]['selfLiked'] = ($isSelfLiked > 0) ? true : false;
+
+            $comments = PostComment::where('id_post', $postItem['id'])->get();
+            foreach ($comments as $commentKey => $comment) {
+                $user = User::find($comment['id_user']);
+                $comments[$commentKey]['user'] = $user;
+                $user['avatar'] = url('media/avatars/' . $user['avatar']);
+                $user['cover'] = url('media/covers/' . $user['cover']);
+            }
+            $postList[$postKey]['comments'] = $comments;
+        }
+
+        return $postList;
     }
 }
