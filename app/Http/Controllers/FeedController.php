@@ -149,6 +149,7 @@ class FeedController extends Controller {
 
             $likes = PostLike::where('id_post', $postItem['id'])->count();
             $postLikes[$postKey]['likeCount'] = $likes;
+            $userInfo['likeCount'] = $likes;
 
             $isSelfLiked = PostLike::where('id_post', $postItem['id'])
                 ->where('id_user', $loggedUserId)
