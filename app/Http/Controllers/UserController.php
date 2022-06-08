@@ -104,4 +104,36 @@ class UserController extends Controller {
 
         return $returnArray;
     }
+
+    public function updateCover(Request $r) {
+        $returnArray = ['error' => ''];
+
+        $allowedtypes = ['image/jpg', 'image/jpeg', 'image/png'];
+
+        $image = $r->file('cover');
+
+        if ($image) {
+            if (in_array($image->getClientMimeType(), $allowedtypes)) {
+                $user = User::find($this->loggedUser['id']);
+
+                $filename = md5(time() . rand(0, 9999)) . 'jpg';
+
+                $destPath = public_path('/media/covers');
+
+                $image = Image::make($image->path())
+                    ->fit(850, 310)
+                    ->save($destPath . '/' . $filename);
+                $user->cover = $filename;
+                $user->save();
+
+                $returnArray['url'] = url('/media/covers/' . $filename);
+            } else {
+                $returnArray['error'] = 'Not a valid image format';
+            }
+        } else {
+            $returnArray['error'] = 'Upload failed';
+        }
+
+        return $returnArray;
+    }
 }
