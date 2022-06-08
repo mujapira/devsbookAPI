@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Intervention\Image\ImageManagerStatic as Image;
 
 class UserController extends Controller {
 
@@ -68,6 +69,38 @@ class UserController extends Controller {
         }
 
         $user->save();
+
+        return $returnArray;
+    }
+
+    public function updateAvatar(Request $r) {
+        $returnArray = ['error' => ''];
+
+        $allowedtypes = ['image/jpg', 'image/jpeg', 'image/png'];
+
+        $image = $r->file('avatar');
+
+        if ($image) {
+            if (in_array($image->getClientMimeType(), $allowedtypes)) {
+                $user = User::find($this->loggedUser['id']);
+
+                $filename = md5(time() . rand(0, 9999)) . 'jpg';
+
+                $destPath = public_path('/media/avatars');
+
+                $image = Image::make($image->path())
+                    ->fit(200, 200)
+                    ->save($destPath . '/' . $filename);
+                $user->avatar = $filename;
+                $user->save();
+
+                $returnArray['url'] = url('/media/avatars/' . $filename);
+            } else {
+                $returnArray['error'] = 'Not a valid image format';
+            }
+        } else {
+            $returnArray['error'] = 'Upload failed';
+        }
 
         return $returnArray;
     }
