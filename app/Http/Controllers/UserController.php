@@ -202,4 +202,39 @@ class UserController extends Controller {
 
         return $data;
     }
+
+    public function relations($id) {
+        $data = ['error' => ''];
+        $userExists = User::find($id);
+
+        if (!$userExists) {
+            $data = ['error' => 'User does not exist'];
+        } else {
+            $followers = UserRelation::where('user_to', $id)->get();
+            $following = UserRelation::where('user_from', $id)->get();
+
+            $data['followers'] = [];
+            $data['following'] = [];
+
+            foreach ($followers as $item) {
+                $user = User::find($item['user_from']);
+                $data['followers'][] = [
+                    'id' => $user['id'],
+                    'name' => $user['name'],
+                    'avatar' => url('media/avatars/' . $user['avatar'])
+                ];
+            }
+
+            foreach ($following as $item) {
+                $user = User::find($item['user_from']);
+                $data['following'][] = [
+                    'id' => $user['id'],
+                    'name' => $user['name'],
+                    'avatar' => url('media/avatars/' . $user['avatar'])
+                ];
+            }
+        }
+
+        return $data;
+    }
 }
