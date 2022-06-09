@@ -26,7 +26,6 @@ return new class extends Migration {
 
         Schema::create('userrelations', function (Blueprint $table) {
             $table->id();
-            $table->string("email", 100);
             $table->integer("user_from");
             $table->integer("user_to");
         });
