@@ -168,4 +168,40 @@ class FeedController extends Controller {
 
         return $postList;
     }
+
+    public function userPhotos(Request $r, $id = false) {
+        $data = ['error' => ''];
+
+        if ($id == false) {
+            $id = $this->loggedUser['id'];
+        }
+
+        $page = intval($r->input('page'));
+        $perPage = 2;
+
+        $photosListOrderedByCreatedAt = Post::where('id_user', $id)
+            ->where('type', 'photo')
+            ->orderBy('created_at', 'desc')
+            ->offset($page * $perPage)
+            ->limit($perPage)
+            ->get();
+
+        $totalPhotoQuantity = Post::where('id_user', $id)
+            ->where('type', 'photo')
+            ->count();
+        $pageCount = ceil(($totalPhotoQuantity / $perPage));
+        $postList = $photosListOrderedByCreatedAt;
+
+        $postsWithAdditionalInfo = $this->_postListToObjetc($postList, $this->loggedUser['id']);
+
+        foreach ($postsWithAdditionalInfo as $pkey => $post) {
+            $postsWithAdditionalInfo[$pkey]['body'] = url('media/uploads/' . $postsWithAdditionalInfo[$pkey]['body']);
+        }
+
+        $data['posts'] = $postsWithAdditionalInfo;
+        $data['pageCount'] = $pageCount;
+        $data['CurrentPage'] = $page;
+
+        return $data;
+    }
 }
