@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
+use App\Models\PostComment;
 use App\Models\PostLike;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -47,5 +48,27 @@ class PostController extends Controller {
         }
 
         return $returnArray;
+    }
+
+    public function comment(Request $r, $id) {
+        $data = ['error' => ''];
+        $txt = $r->input('txt');
+        $postExists = Post::find($id);
+
+        if ($postExists) {
+            if ($txt) {
+                $newComment = new PostComment();
+                $newComment->id_post = $id;
+                $newComment->id_user = $this->loggedUser['id'];
+                $newComment->created_at = date('Y-m-d H:i:s');
+                $newComment->body = $txt;
+                $newComment->save();
+            } else {
+                $data['error'] = 'Text not found';
+            }
+        } else {
+            $data['error'] = 'Post not found';
+        }
+        return $data;
     }
 }
