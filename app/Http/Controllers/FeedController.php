@@ -76,7 +76,7 @@ class FeedController extends Controller {
     public function read(Request $r) {
         $returnArray = ['error' => ''];
         $page = intval($r->input('page'));
-        $perPage = 2;
+        $perPage = 8;
         $allUsers = [];
 
         $usersFollowedByLoggeduser = UserRelation::where('user_from', $this->loggedUser['id']);
@@ -112,7 +112,7 @@ class FeedController extends Controller {
         }
 
         $page = intval($r->input('page'));
-        $perPage = 2;
+        $perPage = 8;
 
         $PostListOrderedByCreatedAt = Post::where('id_user', $id)
             ->orderBy('created_at', 'desc')
