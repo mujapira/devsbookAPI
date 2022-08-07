@@ -83,7 +83,7 @@ class FeedController extends Controller
         $perPage = 8;
         $allUsers = [];
 
-        $usersFollowedByLoggeduser = UserRelation::where('user_from', $this->loggedUser['id'])->execute();
+        $usersFollowedByLoggeduser = UserRelation::where('user_from', $this->loggedUser['id'])->get();
         foreach ($usersFollowedByLoggeduser as $userFollowedByLoggeduser) {
             $allUsers[] = $userFollowedByLoggeduser['user_to'];
         }
