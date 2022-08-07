@@ -87,6 +87,7 @@ class FeedController extends Controller
         foreach ($usersFollowedByLoggeduser as $userFollowedByLoggeduser) {
             $allUsers[] = $userFollowedByLoggeduser['user_to'];
         }
+        $returnArray['followedUsersbefore'] = $allUsers;
         $allUsers[] = $this->loggedUser['id'];
 
         $PostListOrderedByCreatedAt = Post::whereIn('id_user', $allUsers)
