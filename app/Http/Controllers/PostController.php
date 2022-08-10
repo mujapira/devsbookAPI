@@ -63,6 +63,11 @@ class PostController extends Controller {
                 $newComment->created_at = date('Y-m-d H:i:s');
                 $newComment->body = $txt;
                 $newComment->save();
+
+                $returnArray['id_post'] = $id;
+                $returnArray['id_user'] = $this->loggedUser['id'];
+                $returnArray['created_at'] = date('Y-m-d H:i:s');
+                $returnArray['body'] =  $txt;
             } else {
                 $data['error'] = 'Text not found';
             }

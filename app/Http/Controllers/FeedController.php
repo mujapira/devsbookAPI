@@ -12,14 +12,17 @@ use App\Models\PostComment;
 use App\Models\UserRelation;
 use App\Models\User;
 
-class FeedController extends Controller {
+class FeedController extends Controller
+{
     private $loggedUser;
-    public function __construct() {
+    public function __construct()
+    {
         $this->middleware('auth:api');
         $this->loggedUser = auth()->user();
     }
 
-    public function create(Request $r) {
+    public function create(Request $r)
+    {
         $returnArray = ['error' => ''];
         $allowedtypes = ['image/jpg', 'image/jpeg', 'image/png'];
 
@@ -73,7 +76,8 @@ class FeedController extends Controller {
         return $returnArray;
     }
 
-    public function read(Request $r) {
+    public function read(Request $r)
+    {
         $returnArray = ['error' => ''];
         $page = intval($r->input('page'));
         $perPage = 8;
@@ -104,7 +108,8 @@ class FeedController extends Controller {
         return $returnArray;
     }
 
-    public function userFeed(Request $r, $id = false) {
+    public function userFeed(Request $r, $id = false)
+    {
         $returnArray = ['error' => ''];
 
         if ($id == false) {
@@ -133,7 +138,8 @@ class FeedController extends Controller {
         return $returnArray;
     }
 
-    private function _postListToObjetc($postList, $loggedUserId) {
+    private function _postListToObjetc($postList, $loggedUserId)
+    {
         foreach ($postList as $postKey => $postItem) {
 
             if ($postItem['id_user'] == $loggedUserId) {
@@ -169,7 +175,8 @@ class FeedController extends Controller {
         return $postList;
     }
 
-    public function userPhotos(Request $r, $id = false) {
+    public function userPhotos(Request $r, $id = false)
+    {
         $data = ['error' => ''];
 
         if ($id == false) {
