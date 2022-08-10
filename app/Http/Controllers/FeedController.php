@@ -83,10 +83,11 @@ class FeedController extends Controller
         $perPage = 8;
         $allUsers = [];
 
-        $usersFollowedByLoggeduser = UserRelation::where('user_from', $this->loggedUser['id']);
+        $usersFollowedByLoggeduser = UserRelation::where('user_from', $this->loggedUser['id'])->get();
         foreach ($usersFollowedByLoggeduser as $userFollowedByLoggeduser) {
             $allUsers[] = $userFollowedByLoggeduser['user_to'];
         }
+        
         $allUsers[] = $this->loggedUser['id'];
 
         $PostListOrderedByCreatedAt = Post::whereIn('id_user', $allUsers)
@@ -101,6 +102,7 @@ class FeedController extends Controller
 
         $postsWithAdditionalInfo = $this->_postListToObjetc($postList, $this->loggedUser['id']);
 
+        $returnArray['followedUsers'] = $allUsers;
         $returnArray['posts'] = $postsWithAdditionalInfo;
         $returnArray['pageCount'] = $pageCount;
         $returnArray['CurrentPage'] = $page;
