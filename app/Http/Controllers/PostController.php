@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Post;
 use App\Models\PostComment;
 use App\Models\PostLike;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -54,16 +55,18 @@ class PostController extends Controller {
         $data = ['error' => ''];
         $txt = $r->input('txt');
         $postExists = Post::find($id);
-
         if ($postExists) {
+            $userInfo = User::find($id);
             if ($txt) {
                 $newComment = new PostComment();
                 $newComment->id_post = $id;
                 $newComment->id_user = $this->loggedUser['id'];
                 $newComment->created_at = date('Y-m-d H:i:s');
                 $newComment->body = $txt;
+                $newComment->owner = $userInfo;
                 $newComment->save();
 
+                $data['owner'] = $userInfo;
                 $data['id_post'] = $id;
                 $data['id_user'] = $this->loggedUser['id'];
                 $data['created_at'] = date('Y-m-d H:i:s');
