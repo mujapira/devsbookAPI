@@ -87,7 +87,7 @@ class FeedController extends Controller
         foreach ($usersFollowedByLoggeduser as $userFollowedByLoggeduser) {
             $allUsers[] = $userFollowedByLoggeduser['user_to'];
         }
-        
+
         $allUsers[] = $this->loggedUser['id'];
 
         $PostListOrderedByCreatedAt = Post::whereIn('id_user', $allUsers)
@@ -210,6 +210,24 @@ class FeedController extends Controller
         $data['posts'] = $postsWithAdditionalInfo;
         $data['pageCount'] = $pageCount;
         $data['CurrentPage'] = $page;
+
+        return $data;
+    }
+
+
+    public function delete($id)
+    {
+        $data = ['error' => ''];
+
+        $post = Post::find($id);
+        $loggedUserId = $this->loggedUser['id'];
+
+        if ($post['id_user'] === $loggedUserId) {
+            PostLike::where('id_post', $id)->delete();
+            PostComment::where('id_post', $id)->delete();
+            Post::where('id', $id)->delete();
+            $data['ok'];
+        }
 
         return $data;
     }

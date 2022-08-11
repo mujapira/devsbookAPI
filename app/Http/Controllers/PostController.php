@@ -68,7 +68,7 @@ class PostController extends Controller
                 $newComment->created_at = date('Y-m-d H:i:s');
                 $newComment->body = $txt;
                 $newComment->save();
-             
+
                 $data['id_post'] = $id;
                 $data['id_user'] = $this->loggedUser['id'];
                 $data['created_at'] = date('Y-m-d H:i:s');
@@ -81,4 +81,6 @@ class PostController extends Controller
         }
         return $data;
     }
+
+
 }
