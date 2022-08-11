@@ -57,16 +57,8 @@ class PostController extends Controller
     public function comment(Request $r, $id)
     {
         $data = ['error' => ''];
-        $data = ['owner' => ''];
-
         $txt = $r->input('txt');
         $postExists = Post::find($id);
-        $userInfo = User::find($id);
-
-        $data['owner']['avatar'] = url('media/avatars/' . $userInfo['avatar']);
-        $data['owner']['cover'] = url('media/covers/' . $userInfo['cover']);
-        $data['owner']['cover'] = $userInfo['name'];
-
         if ($postExists) {
 
             if ($txt) {
@@ -76,8 +68,7 @@ class PostController extends Controller
                 $newComment->created_at = date('Y-m-d H:i:s');
                 $newComment->body = $txt;
                 $newComment->save();
-
-
+             
                 $data['id_post'] = $id;
                 $data['id_user'] = $this->loggedUser['id'];
                 $data['created_at'] = date('Y-m-d H:i:s');
@@ -91,35 +82,3 @@ class PostController extends Controller
         return $data;
     }
 }
-/* 
- if ($id) {
-            $userInfo = User::find($id);
-            if (!$userInfo) {
-                $returnArray['error'] = 'User not found';
-            }
-        } else {
-            $userInfo = $this->loggedUser;
-        }
-
-        $userInfo['avatar'] = url('media/avatars/' . $userInfo['avatar']);
-        $userInfo['cover'] = url('media/covers/' . $userInfo['cover']);
-
-        $userInfo['me'] = ($userInfo['id'] == $this->loggedUser['id']) ? true : false;
-
-        $dateFrom = new \DateTime($userInfo['birthdate']);
-        $dateTo = new \DateTime('today');
-        $userInfo['age'] = $dateFrom->diff($dateTo)->y;
-
-        $userInfo['followers'] = UserRelation::where('user_to', $userInfo['id'])->count();
-        $userInfo['following'] = UserRelation::where('user_from', $userInfo['id'])->count();
-        $userInfo['photoCount'] = Post::where('id_user', $userInfo['id'])
-            ->where('type', 'photo')
-            ->count();
-
-
-        $hasRelation = UserRelation::where('user_from', $this->loggedUser['id'])
-            ->where('user_to', $userInfo['id'])->count();
-
-        $userInfo['isFollowing'] = ($hasRelation > 0) ? true : false;
-
-        $returnArray['data'] = $userInfo; */
