@@ -5,17 +5,21 @@ namespace App\Http\Controllers;
 use App\Models\Post;
 use App\Models\PostComment;
 use App\Models\PostLike;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class PostController extends Controller {
+class PostController extends Controller
+{
     private $loggedUser;
-    public function __construct() {
+    public function __construct()
+    {
         $this->middleware('auth:api');
         $this->loggedUser = auth()->user();
     }
 
-    public function like($id) {
+    public function like($id)
+    {
         $returnArray = ['error' => ''];
 
         $postExists = Post::find($id);
@@ -50,12 +54,13 @@ class PostController extends Controller {
         return $returnArray;
     }
 
-    public function comment(Request $r, $id) {
+    public function comment(Request $r, $id)
+    {
         $data = ['error' => ''];
         $txt = $r->input('txt');
         $postExists = Post::find($id);
-
         if ($postExists) {
+
             if ($txt) {
                 $newComment = new PostComment();
                 $newComment->id_post = $id;
@@ -63,6 +68,14 @@ class PostController extends Controller {
                 $newComment->created_at = date('Y-m-d H:i:s');
                 $newComment->body = $txt;
                 $newComment->save();
+
+                $userInfo = User::find($id);
+                $data['owner'] = $userInfo;
+                $data['id_post'] = $id;
+                $data['id_user'] = $this->loggedUser['id'];
+                $data['created_at'] = date('Y-m-d H:i:s');
+                $data['body'] =  $txt;
+                
             } else {
                 $data['error'] = 'Text not found';
             }
