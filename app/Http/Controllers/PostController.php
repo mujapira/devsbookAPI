@@ -60,6 +60,7 @@ class PostController extends Controller
         $txt = $r->input('txt');
         $postExists = Post::find($id);
         if ($postExists) {
+
             if ($txt) {
                 $newComment = new PostComment();
                 $newComment->id_post = $id;
@@ -67,6 +68,13 @@ class PostController extends Controller
                 $newComment->created_at = date('Y-m-d H:i:s');
                 $newComment->body = $txt;
                 $newComment->save();
+                
+                $userInfo = User::find($id);
+                $data['owner'] = $userInfo;
+                $data['id_post'] = $id;
+                $data['id_user'] = $this->loggedUser['id'];
+                $data['created_at'] = date('Y-m-d H:i:s');
+                $data['body'] =  $txt;
             } else {
                 $data['error'] = 'Text not found';
             }
