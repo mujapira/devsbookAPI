@@ -69,7 +69,7 @@ class PostController extends Controller
                 $newComment->body = $txt;
                 $newComment->save();
                 
-                $userInfo = User::find($id)->get();
+                $userInfo = User::where('id', $id)->get();
                 $data['owner'] = $userInfo;
                 $data['id_post'] = $id;
                 $data['id_user'] = $this->loggedUser['id'];
